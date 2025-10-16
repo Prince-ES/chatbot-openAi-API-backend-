@@ -1,0 +1,149 @@
+.app{
+  position: absolute;
+  background-color: rgb(66, 65, 65);
+  height: 100vh;
+  width: 35rem;
+  padding-top: 3rem;
+  transform: translateX(-50%);
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 100px 20px 20px 20px;
+}
+
+.chat-container{
+  overflow:scroll;
+  scrollbar-width: none;
+}
+
+.app .title-header{
+  top: 20px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color:white;
+  font-size: 20px;
+  font-weight: 500;
+  cursor:pointer
+}
+
+.chats{
+  width: 100%;
+}
+
+.chat-message-user{
+  display:flex;
+  justify-content: flex-end;
+  margin-bottom: 0.7rem;
+}
+
+.chats .user-chat{
+  flex-direction: row-reverse;
+  display: flex;;
+  justify-content: flex-start;
+  max-width: 60%;
+}
+
+.chats .user-chat .user-pfp{
+  height: 49px;
+  width: 49px;
+  border:1px solid black;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chats .user-chat .user-pfp img{
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+}
+
+.chats .user-chat .user-message{
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  font-size: 14px;;
+  background-color: rgba(255,255,255,0.3);
+  border-radius: 5px 10px;
+  padding: 10px;
+}
+
+.chats .chatbot-chat{
+  display: flex;
+  align-items: flex-start;
+
+  margin-bottom: 0.7rem;
+}
+
+.chats .chatbot-chat .chatbot-pfp{
+  height: 49px;
+  width: 49px;
+  border:1px solid black;
+  border-radius: 50%;
+  flex-shrink: 0;
+    display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chats .chatbot-chat .chatbot-pfp img{
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+}
+
+.chats .chatbot-chat .chatbot-message{
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  font-size: 14px;;
+  background-color: rgba(255,255,255,0.3);
+  border-radius: 10px;
+  padding: 10px;
+  max-width: 50%;
+}
+
+.input-container{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.input-container .input-box{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.input-container .input-box input{
+  width: 88%;
+  height: 50px;
+  border-radius: 5px;
+  border: none;
+  padding: 0px 10px;
+  font-size: 16px;
+}
+
+.input-container .input-box input:focus{
+  outline: none;
+}
+
+.input-container .input-box button{
+  width: 10%;
+  height: 50px;
+  border-radius: 5px;
+  border: none;
+  background-color: gray;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+
+
