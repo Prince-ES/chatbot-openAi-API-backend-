@@ -1,6 +1,18 @@
 {
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "nod": "^0.2.0",
+    "node": "^24.10.0",
+    "openai": "^6.3.0"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.10"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   }
 }
