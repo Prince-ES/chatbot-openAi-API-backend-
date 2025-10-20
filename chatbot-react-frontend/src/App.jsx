@@ -5,24 +5,9 @@ import './App.css'
 
 function App() {
 
-  const [chatMessages, setChatMessages] = useState(JSON.parse(localStorage.getItem('chatMessages')) || [
-    {
-      sender: "user",
-      message: "Hello!"
-    },
-    {
-      sender: "chatbot",
-      message: "Hello! How's going?"
-    },
-    {
-      sender: "user",
-      message: "Flip a coin."
-    },
-    {
-      sender: "chatbot",
-      message: `sure, you got a ${Math.random() > 0.5 ? 'heads' : 'tails'}`
-    }
-  ]);
+  const chatSession = JSON.parse(localStorage.getItem('chats')) || localStorage.setItem('chats', JSON.stringify(crypto.randomUUID()));
+
+  const [chatMessages, setChatMessages] = useState(JSON.parse(localStorage.getItem('chatMessages')) || []);
 
   const chatMessagesRef = useRef(null);
 
@@ -38,42 +23,53 @@ function App() {
 
   function controlledInput(event) {
     setInputText(event.target.value);
-  }
+  }  
 
   async function sendMessage() {
-     const newChatMessages= ([
+    //when clicked send, make a post request to backend ('/api/chat') with message, sender, sessionId and default time will be added in the backend itself.
+    if (inputText.trim() === '') return;//if input is empty, do nothing
+
+    let newChatMessages = ([
       ...chatMessages,{
-        sender:"user",
-        message:inputText
+        sessionId:chatSession,
+        sender:'user',
+        message: inputText
       }
-     ]);
-
-    setChatMessages(newChatMessages);
-    setInputText('');
+    ])
+   
 
     setChatMessages([
       ...newChatMessages,{
+        sessionId:chatSession,
         sender:'chatbot',
-        message:'loading...'
-      }]
-    )
-
+        message:'loading...',
+      }
+    ])
+    console.log(inputText);
     const chatbotResponse = await axios.post('http://localhost:5000/api/chat',{
-      message:inputText     
-    })
+      sessionId: chatSession,
+      message: inputText,
+    });
+
+    const responseData = chatbotResponse.data;
 
     setChatMessages([
       ...newChatMessages,{
-        sender:"chatbot", message:chatbotResponse.data.reply
+        sessionId: responseData.sessionId,
+        sender: 'chatbot',
+        message:responseData.reply
       }
     ])
 
     localStorage.setItem('chatMessages', JSON.stringify([
       ...newChatMessages,{
-        sender:"chatbot", message:chatbotResponse.data.reply
+      sessionId: responseData.sessionId,
+      sender:'chatbot',
+      message:responseData.reply
       }
     ]))
 
+    
   }
 
   function resetChats(){
@@ -84,6 +80,7 @@ function App() {
   function enterWorking(event) {
     if (event.key === 'Enter') {
       sendMessage();
+      setInputText('');
     }
   }
   return (
