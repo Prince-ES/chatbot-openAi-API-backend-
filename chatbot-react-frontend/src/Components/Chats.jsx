@@ -1,13 +1,14 @@
 
 export function Chats({chatMessages}) {
-
+  
   return (
     <div className="chats">
       {chatMessages.map((chatMessage, index) => {
+        const extention = chatMessage.sender === 'user' ? "png" : "png";
         return <div className={`chat-message-${chatMessage.sender}`} key={index}>
           <div className={`${chatMessage.sender}-chat`}>
             <div className={`${chatMessage.sender}-pfp`}>
-              <img src={`/images/${chatMessage.sender}.jpg`} alt="" />
+              <img src={`/images/${chatMessage.sender}.${extention}`} alt="" />
             </div>
             <div className={`${chatMessage.sender}-message`}>
               {chatMessage.message}

@@ -4,10 +4,49 @@ import { Chats } from './Components/Chats';
 import './App.css'
 
 function App() {
+  //one request was to get all the session and one to get the currect session(since we're generating id from backend.) we'll load all session once and run useState function only when a new session is created.
 
-  const chatSession = JSON.parse(localStorage.getItem('chats')) || localStorage.setItem('chats', JSON.stringify(crypto.randomUUID()));
+  const [chatSessionId,setChatSessionId] = useState(localStorage.getItem('activeSession'));
+  console.log(chatSessionId);
 
-  const [chatMessages, setChatMessages] = useState(JSON.parse(localStorage.getItem('chatMessages')) || []);
+  const [sessions,setSessions] = useState([]);
+  console.log(sessions);
+  useEffect(()=>{//getting all the sessions whenever sessions change.
+    async function getAllSessions(){
+       await axios.get('http://localhost:5000/api/sessions')
+        .then((res)=>{
+          setSessions(res.data);
+        })
+    }
+    getAllSessions();
+  },[]);
+  
+    useEffect(()=>{
+      if(!chatSessionId){
+      async function newSession(){
+        const newChatSessionId = await  axios.post('http://localhost:5000/api/sessions',{});//creating a new session Id from backend;
+        localStorage.setItem('activeSession',newChatSessionId.data.sessionId);
+        setSessions(prev => [...prev,{sessionId:newChatSessionId.data.sessionId, title:newChatSessionId.data.title}])
+        setChatSessionId(newChatSessionId.data.sessionId);
+        console.log('sessionCreated')
+      }
+      newSession();
+
+   }
+
+    },[chatSessionId]);
+  
+
+  const [chatMessages, setChatMessages] = useState([]);
+
+  useEffect(()=>{
+    const sessionId = localStorage.getItem('activeSession');
+    axios.get(`http://localhost:5000/api/chats/${sessionId}/messages`)
+      .then((res)=>{
+        setChatMessages(res.data);
+      })
+      .catch(err => console.error("failed to load chat history:", err));
+  },[chatSessionId])
 
   const chatMessagesRef = useRef(null);
 
@@ -31,7 +70,7 @@ function App() {
 
     let newChatMessages = ([
       ...chatMessages,{
-        sessionId:chatSession,
+        sessionId:chatSessionId,
         sender:'user',
         message: inputText
       }
@@ -40,14 +79,14 @@ function App() {
 
     setChatMessages([
       ...newChatMessages,{
-        sessionId:chatSession,
+        sessionId:chatSessionId,
         sender:'chatbot',
         message:'loading...',
       }
     ])
-    console.log(inputText);
-    const chatbotResponse = await axios.post('http://localhost:5000/api/chat',{
-      sessionId: chatSession,
+
+    const chatbotResponse = await axios.post(`http://localhost:5000/api/chats/${chatSessionId}/messages`,{
+      sessionId: chatSessionId,
       message: inputText,
     });
 
@@ -59,22 +98,13 @@ function App() {
         sender: 'chatbot',
         message:responseData.reply
       }
-    ])
-
-    localStorage.setItem('chatMessages', JSON.stringify([
-      ...newChatMessages,{
-      sessionId: responseData.sessionId,
-      sender:'chatbot',
-      message:responseData.reply
-      }
-    ]))
-
-    
+    ])    
   }
 
   function resetChats(){
-    localStorage.removeItem('chatMessages');
+    localStorage.removeItem('activeSession');
     setChatMessages([]);
+    setChatSessionId(null);
   }
 
   function enterWorking(event) {
@@ -82,12 +112,40 @@ function App() {
       sendMessage();
       setInputText('');
     }
+  } 
+
+  function getParticularSession(sessionId){
+    localStorage.setItem('activeSession',sessionId);
+    setChatSessionId(sessionId);
+
   }
   return (
     <>
       <div className="app">
-        <header className="title-header" onClick={resetChats}>
-            <h1>Chatbot 2.0</h1>
+        <label htmlFor="sidebar" className='problem'>
+          <i className='fas fa-hamburger'></i>
+        </label>
+        <input type="checkbox" id="sidebar"/>
+        <nav>
+          <div className="top">
+            <strong>Previous chats:-</strong>
+            <label htmlFor='sidebar'>
+              <div><i className='fas fa-times'></i></div>
+            </label>          
+          </div>
+          <div className="bottom">
+            <ol>
+              {sessions.map((session)=>{
+                return <li key={session.sessionId} onClick={()=>{
+                  getParticularSession(session.sessionId)
+                }}>{session.title}</li>
+              })}
+            </ol>
+
+          </div>
+        </nav>
+        <header className="title-header"  >
+            <h1 style={{ display:'inline'}} onClick={resetChats}>chatbot <span style={{fontSize:'11px'}}>personalty no. 1</span></h1>
           </header>
         <div className="chat-container" ref= {chatMessagesRef}>          
           <Chats chatMessages={chatMessages} />
@@ -95,7 +153,10 @@ function App() {
         <div className="input-container">
           <div className="input-box">
             <input type="text" placeholder="Type a message..." onChange={controlledInput} value={inputText} onKeyDown={enterWorking} />
-            <button onClick={sendMessage}>
+            <button onClick={()=>{
+              sendMessage();
+              setInputText('');
+            }}>
               <i className='fas fa-arrow-up'></i>
             </button>
           </div>
@@ -106,3 +167,5 @@ function App() {
 }
 
 export default App
+//commit 1: adding sesson feature
+//commit 2: switching between different session
