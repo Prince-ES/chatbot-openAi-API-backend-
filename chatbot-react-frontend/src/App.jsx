@@ -101,7 +101,7 @@ function App() {
     ])    
   }
 
-  function resetChats(){
+  function startNewChat(){
     localStorage.removeItem('activeSession');
     setChatMessages([]);
     setChatSessionId(null);
@@ -145,27 +145,37 @@ function App() {
         <input type="checkbox" id="sidebar"/>
         <nav>
           <div className="top">
-            <strong>Previous chats:-</strong>
+            <strong>Actions:-</strong>
             <label htmlFor='sidebar'>
               <div><i className='fas fa-times'></i></div>
             </label>          
           </div>
           <div className="bottom">
-            <ol>
-              {[...sessions].reverse().map((session)=>{
-                return <li key={session.sessionId} onClick={()=>{
-                  getParticularSession(session.sessionId)
-                }}>{session.title} <span className='delete-particular-session' onClick={(e)=>{
-                  e.stopPropagation();
-                  deleteParticularSession(session.sessionId);
-                }}>Delete</span></li>
-              })}
-            </ol>
+            <div className='all-actions'>
 
+              <div className="start-new-chat">
+                <i className='fas fa-plus'></i>
+                <div className='new-chat' onClick={startNewChat}>New Chat</div>
+              </div>
+              
+            </div>
+            <div className="previous-chats">
+              <h3 className="previous-chats-title">Previous Chats:-</h3>
+              <ol>
+                {[...sessions].reverse().map((session)=>{
+                  return <li className="session" key={session.sessionId} onClick={()=>{
+                    getParticularSession(session.sessionId)
+                  }}>{session.title} <span className='delete-particular-session' onClick={(e)=>{
+                    e.stopPropagation();
+                    deleteParticularSession(session.sessionId);
+                  }}>Delete</span></li>
+                })}
+              </ol>
+            </div>
           </div>
         </nav>
         <header className="title-header"  >
-            <h1 style={{ display:'inline'}} onClick={resetChats}>chatbot <span style={{fontSize:'11px'}}>personalty no. 1</span></h1>
+            <h1 style={{ display:'inline'}} >chatbot <span style={{fontSize:'11px'}}>personalty no. 1</span></h1>
           </header>
         <div className="chat-container" ref= {chatMessagesRef}>          
           <Chats chatMessages={chatMessages} />

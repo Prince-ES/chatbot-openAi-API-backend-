@@ -205,20 +205,28 @@ strong{
 }
 
 .bottom{
-  padding-top: 30px;
+  height: 200px;
 }
 
 ol{
   list-style-type: none;
+  padding: 10px 0px;
 }
 
 ol li{
   display: flex;
   align-items: center;
+  font-size: 15px;
   height: 30px;
   width: 100%;
   margin-bottom: 5px;
+  padding-left: 10px;
   cursor:pointer;
+}
+
+ol li:hover{
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 5px;
 }
 
 .problem{
@@ -232,3 +240,40 @@ ol li{
   margin-left: 15px;
   padding: 0px 5px;
 }
+
+.all-actions{
+  height: 120px;
+}
+
+.fa-plus{
+  color:white;
+  margin-right: 10px;
+  font-size: 15px;
+  margin-left: 10px;
+}
+
+.start-new-chat{  
+  display: flex;  
+  align-items: center;
+  height: 40px;
+  line-height:40px;
+  margin-top: 10px;
+  cursor:pointer;  
+  transition: 0.15s ease-in-out;
+}
+
+.start-new-chat:hover{
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 5px;;
+}
+
+.previous-chats-title{
+  border-bottom: 1px solid gray;
+  height: 50px;
+  line-height: 50px;
+}
+
+.session :hover{
+
+}
+
