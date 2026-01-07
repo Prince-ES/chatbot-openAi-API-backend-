@@ -226,3 +226,9 @@ ol li{
   top: 0px;
   left: 20px;
 }
+.delete-particular-session{
+  background-color: white;
+  color:black;
+  margin-left: 15px;
+  padding: 0px 5px;
+}

@@ -150,6 +150,31 @@ app.get('/api/sessions',async(req,res)=>{
     res.json(allSession);
 })
 
+app.delete('/api/sessions/:sessionId',async (req,res)=>{
+  const sessionId = req.params.sessionId;
+
+  try{
+    const chatResult = await ChatModel.deleteMany({sessionId});
+    const sessionResult = await sessionModel.deleteOne({sessionId});
+
+    if(sessionResult.deletedCount === 0){
+      return res.status(404).json({
+        success:false,
+        message: 'session not found'
+      })
+    }
+
+    res.json({
+      success:true,
+      message:'session deleted successfully'
+    })
+
+  }catch(err){
+    console.log('Error deleting the session',err);
+  }
+  
+})
+
 app.listen(5000, () => {
   console.log('Server is running on port 5000');
 })

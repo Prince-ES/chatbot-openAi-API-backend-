@@ -116,8 +116,25 @@ function App() {
 
   function getParticularSession(sessionId){
     localStorage.setItem('activeSession',sessionId);
+    console.log('got particular session:',sessionId);
     setChatSessionId(sessionId);
 
+  }
+
+  async function deleteParticularSession(sessionId){
+    //when a session is to be deleted: the sidebar should be re-rendered and we should be moved to new session.
+    setChatSessionId(null);
+    localStorage.removeItem('activeSession');
+    console.log(localStorage.getItem('activeSession'));
+    setSessions(prev=> prev.filter(s => s.sessionId !== sessionId));
+    setChatMessages([]);
+    
+    
+    
+    const res = await axios.delete(`http://localhost:5000/api/sessions/${sessionId}`,{});//this is to delete the session from backend 
+    console.log(res.data.message);
+
+    //when current session is deleted, the chat messages are cleared, session is cleared from sidebar but the session id is still in localStorage somehow.
   }
   return (
     <>
@@ -135,10 +152,13 @@ function App() {
           </div>
           <div className="bottom">
             <ol>
-              {sessions.map((session)=>{
+              {[...sessions].reverse().map((session)=>{
                 return <li key={session.sessionId} onClick={()=>{
                   getParticularSession(session.sessionId)
-                }}>{session.title}</li>
+                }}>{session.title} <span className='delete-particular-session' onClick={(e)=>{
+                  e.stopPropagation();
+                  deleteParticularSession(session.sessionId);
+                }}>Delete</span></li>
               })}
             </ol>
 
@@ -167,5 +187,6 @@ function App() {
 }
 
 export default App
-//commit 1: adding sesson feature
-//commit 2: switching between different session
+//current behaviour: you can switch between different sessions and delete a session. on clicking delete, a new session will be created on the spot and u'll be switched to it. 
+//clicking on title will shift you to new session without deleting the current. 
+//new sessions are at top and title is newChat+ time
