@@ -40,8 +40,8 @@ function App() {
   const [chatMessages, setChatMessages] = useState([]);
 
   useEffect(()=>{
-    const sessionId = localStorage.getItem('activeSession');
-    axios.get(`http://localhost:5000/api/chats/${sessionId}/messages`)
+    if (!chatSessionId) return;
+    axios.get(`http://localhost:5000/api/chats/${chatSessionId}/messages`)
       .then((res)=>{
         setChatMessages(res.data);
       })
@@ -122,18 +122,33 @@ function App() {
   }
 
   async function deleteParticularSession(sessionId){
-    //when a session is to be deleted: the sidebar should be re-rendered and we should be moved to new session.
-    setChatSessionId(null);
-    localStorage.removeItem('activeSession');
-    console.log(localStorage.getItem('activeSession'));
-    setSessions(prev=> prev.filter(s => s.sessionId !== sessionId));
-    setChatMessages([]);
+    //deletng approach: if we delete a previous session then it'll just delete but if we dete current session, there are two cases:
+    //case 1: no sessions left: In this case we're creating a new chat session and shifting user there.
+    //case 2: more sessions exist: in this case we switch user to previous session.
     
-    
-    
-    const res = await axios.delete(`http://localhost:5000/api/sessions/${sessionId}`,{});//this is to delete the session from backend 
-    console.log(res.data.message);
+    if(chatSessionId != sessionId){
+      const res = await axios.delete(`http://localhost:5000/api/sessions/${sessionId}`,{});//this is to delete the session from backend 
+      console.log(res.data.message);
+      setSessions(prev=> prev.filter(s => s.sessionId !== sessionId));
 
+    }else{
+      const remainingSessions = sessions.filter((s)=>{
+        return s.sessionId != sessionId;
+      })
+      const previousSession = remainingSessions[remainingSessions.length-1];
+
+      if (remainingSessions.length > 0) {
+        setChatSessionId(previousSession.sessionId);
+        localStorage.setItem('activeSession', previousSession.sessionId);
+      } else {
+        setChatSessionId(null);
+      }     
+
+      setSessions(prev=> prev.filter(s => s.sessionId !== sessionId));
+      
+      const res = await axios.delete(`http://localhost:5000/api/sessions/${sessionId}`,{});//this is to delete the session from backend 
+      console.log(res.data.message);    
+    }
     //when current session is deleted, the chat messages are cleared, session is cleared from sidebar but the session id is still in localStorage somehow.
   }
   return (
@@ -163,7 +178,8 @@ function App() {
               <h3 className="previous-chats-title">Previous Chats:-</h3>
               <ol>
                 {[...sessions].reverse().map((session)=>{
-                  return <li className="session" key={session.sessionId} onClick={()=>{
+                  const isActive = chatSessionId === session.sessionId;
+                  return <li className={`session ${isActive? 'highlight-session' : ''}`} key={session.sessionId} onClick={()=>{
                     getParticularSession(session.sessionId)
                   }}>{session.title} <span className='delete-particular-session' onClick={(e)=>{
                     e.stopPropagation();
